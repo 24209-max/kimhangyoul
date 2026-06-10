@@ -4,9 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>AI 학습 도우미</title>
+<title>AI 마케팅 컨설턴트</title>
 
 <style>
+
 *{
 margin:0;
 padding:0;
@@ -24,8 +25,8 @@ padding:30px;
 max-width:1000px;
 margin:auto;
 background:white;
-border-radius:20px;
 padding:25px;
+border-radius:20px;
 box-shadow:0 10px 30px rgba(0,0,0,0.15);
 }
 
@@ -55,11 +56,6 @@ border-radius:10px;
 margin-top:8px;
 }
 
-textarea{
-min-height:150px;
-resize:vertical;
-}
-
 button{
 border:none;
 padding:12px 20px;
@@ -81,11 +77,6 @@ color:white;
 
 .danger{
 background:#ef5350;
-color:white;
-}
-
-.secondary{
-background:#9e9e9e;
 color:white;
 }
 
@@ -120,19 +111,18 @@ justify-content:space-between;
 align-items:center;
 margin-bottom:20px;
 }
+
 </style>
 </head>
 <body>
 
 <div class="container">
 
-<h1>AI 학습 도우미</h1>
+<h1>AI 마케팅 컨설턴트</h1>
 
 <div class="subtitle">
-Firebase + Authentication + AI + TTS
+상품 · 고객층 · 예산을 입력하면 AI가 마케팅 전략을 추천합니다.
 </div>
-
-<!-- 로그인 -->
 
 <div id="loginArea">
 
@@ -166,8 +156,6 @@ Firebase + Authentication + AI + TTS
 
 </div>
 
-<!-- 메인 -->
-
 <div id="mainArea" class="hidden">
 
 <div class="user-info">
@@ -185,45 +173,47 @@ Firebase + Authentication + AI + TTS
 
 <div class="card">
 
-<h3>AI 질문</h3>
+<h3>마케팅 정보 입력</h3>
 
-<textarea
-id="questionInput"
-placeholder="질문을 입력하세요">
-</textarea>
+<input
+id="productInput"
+placeholder="판매 상품">
+
+<input
+id="targetInput"
+placeholder="고객층">
+
+<input
+id="budgetInput"
+placeholder="예산">
 
 <button id="askBtn" class="primary">
-AI 답변 생성
+전략 생성
 </button>
 
 </div>
 
 <div class="card">
 
-<h3>AI 답변</h3>
+<h3>AI 추천 결과</h3>
 
 <div id="answerBox" class="answer">
-아직 답변 없음
+아직 결과 없음
 </div>
 
 </div>
 
 <div class="card">
 
-<h3>TTS 음성 변환</h3>
+<h3>TTS 음성 듣기</h3>
 
 <select id="voiceSelect">
 
 <option value="alloy">alloy</option>
-
 <option value="echo">echo</option>
-
 <option value="fable">fable</option>
-
 <option value="nova">nova</option>
-
 <option value="onyx">onyx</option>
-
 <option value="shimmer">shimmer</option>
 
 </select>
@@ -238,7 +228,7 @@ AI 답변 생성
 
 <div class="card">
 
-<h3>질문 기록</h3>
+<h3>전략 기록</h3>
 
 <div id="historyBox"></div>
 
@@ -247,8 +237,6 @@ AI 답변 생성
 </div>
 
 </div>
-
-  <!-- Firebase SDK -->
 
 <script type="module">
 
@@ -279,14 +267,11 @@ const firebaseConfig = {
   projectId: "ghddbtjdrowlsek",
   storageBucket: "ghddbtjdrowlsek.firebasestorage.app",
   messagingSenderId: "896860078725",
-  appId: "1:896860078725:web:ca6d89954789cc200a9fec",
-  measurementId: "G-WFPBGWQ2R4"
+  appId: "1:896860078725:web:ca6d89954789cc200a9fec"
 };
 
 const app = initializeApp(firebaseConfig);
-
 const auth = getAuth(app);
-
 const db = getDatabase(app);
 
 const CHAT_API =
@@ -301,17 +286,22 @@ const logoutBtn = document.getElementById("logoutBtn");
 
 const loginArea = document.getElementById("loginArea");
 const mainArea = document.getElementById("mainArea");
-
 const userEmail = document.getElementById("userEmail");
 
-const questionInput =
-document.getElementById("questionInput");
+const askBtn = document.getElementById("askBtn");
+const answerBox = document.getElementById("answerBox");
 
-const askBtn =
-document.getElementById("askBtn");
+const productInput =
+document.getElementById("productInput");
 
-const answerBox =
-document.getElementById("answerBox");
+const targetInput =
+document.getElementById("targetInput");
+
+const budgetInput =
+document.getElementById("budgetInput");
+
+const historyBox =
+document.getElementById("historyBox");
 
 const ttsBtn =
 document.getElementById("ttsBtn");
@@ -322,23 +312,14 @@ document.getElementById("voiceSelect");
 const audioPlayer =
 document.getElementById("audioPlayer");
 
-const historyBox =
-document.getElementById("historyBox");
-
-  signupBtn.addEventListener("click", async () => {
-
-  const email =
-    document.getElementById("signupEmail").value;
-
-  const password =
-    document.getElementById("signupPassword").value;
+signupBtn.addEventListener("click", async () => {
 
   try {
 
     await createUserWithEmailAndPassword(
       auth,
-      email,
-      password
+      document.getElementById("signupEmail").value,
+      document.getElementById("signupPassword").value
     );
 
     alert("회원가입 완료");
@@ -353,18 +334,12 @@ document.getElementById("historyBox");
 
 loginBtn.addEventListener("click", async () => {
 
-  const email =
-    document.getElementById("loginEmail").value;
-
-  const password =
-    document.getElementById("loginPassword").value;
-
   try {
 
     await signInWithEmailAndPassword(
       auth,
-      email,
-      password
+      document.getElementById("loginEmail").value,
+      document.getElementById("loginPassword").value
     );
 
   } catch(error) {
@@ -403,43 +378,69 @@ onAuthStateChanged(auth,(user)=>{
 
 askBtn.addEventListener("click", async ()=>{
 
-  const question = questionInput.value.trim();
+  const product = productInput.value;
+  const target = targetInput.value;
+  const budget = budgetInput.value;
 
-  if(!question){
-    alert("질문 입력");
+  if(!product || !target || !budget){
+
+    alert("모든 항목 입력");
+
     return;
+
   }
 
   answerBox.textContent =
-    "답변 생성 중...";
+  "AI 전략 생성 중...";
+
+  const prompt = `
+상품 : ${product}
+
+고객층 : ${target}
+
+예산 : ${budget}
+
+위 정보를 분석하여
+
+1. 추천 홍보 채널
+2. 이벤트 아이디어
+3. 예상 효과
+4. 실행 방법
+
+을 자세히 설명해줘.
+`;
 
   try{
 
-    const response = await fetch(CHAT_API,{
-      method:"POST",
-      body:JSON.stringify({
-        question:question
-      })
-    });
+    const response = await fetch(
+      CHAT_API,
+      {
+        method:"POST",
+        body:JSON.stringify({
+          question:prompt
+        })
+      }
+    );
 
     const data =
-      await response.json();
+    await response.json();
 
     const answer =
-      data.answer ||
-      "답변 없음";
+    data.answer || "결과 없음";
 
     answerBox.textContent =
-      answer;
+    answer;
 
     const user =
-      auth.currentUser;
+    auth.currentUser;
 
     await push(
-      ref(db,"history/"+user.uid),
+      ref(db,"marketing/"+user.uid),
       {
-        question:question,
-        answer:answer,
+        product,
+        target,
+        budget,
+        answer,
         date:new Date().toLocaleString()
       }
     );
@@ -447,7 +448,7 @@ askBtn.addEventListener("click", async ()=>{
   }catch(error){
 
     answerBox.textContent =
-      error.message;
+    error.message;
 
   }
 
@@ -455,57 +456,46 @@ askBtn.addEventListener("click", async ()=>{
 
 ttsBtn.addEventListener("click", async ()=>{
 
-  const text =
-    answerBox.textContent;
-
-  if(
-    !text ||
-    text==="아직 답변 없음"
-  ){
-    alert("먼저 답변 생성");
-    return;
-  }
-
   try{
 
-    const response =
-      await fetch(TTS_API,{
+    const response = await fetch(
+      TTS_API,
+      {
         method:"POST",
         body:JSON.stringify({
           type:"tts",
-          text:text,
+          text:answerBox.textContent,
           model:"tts-1",
           voice:voiceSelect.value,
           speed:1
         })
-      });
+      }
+    );
 
     const data =
-      await response.json();
+    await response.json();
 
     const binary =
-      atob(data.audioBase64);
+    atob(data.audioBase64);
 
     const bytes =
-      new Uint8Array(binary.length);
+    new Uint8Array(binary.length);
 
-    for(
-      let i=0;
-      i<binary.length;
-      i++
-    ){
-      bytes[i]=
+    for(let i=0;i<binary.length;i++){
+
+      bytes[i] =
       binary.charCodeAt(i);
+
     }
 
     const blob =
-      new Blob(
-        [bytes],
-        {type:"audio/mpeg"}
-      );
+    new Blob(
+      [bytes],
+      {type:"audio/mpeg"}
+    );
 
     audioPlayer.src =
-      URL.createObjectURL(blob);
+    URL.createObjectURL(blob);
 
   }catch(error){
 
@@ -518,26 +508,21 @@ ttsBtn.addEventListener("click", async ()=>{
 function loadHistory(uid){
 
   const historyRef =
-    ref(
-      db,
-      "history/"+uid
-    );
+  ref(db,"marketing/"+uid);
 
   onValue(historyRef,(snapshot)=>{
 
-    historyBox.innerHTML="";
+    historyBox.innerHTML = "";
 
     snapshot.forEach((item)=>{
 
-      const data =
-        item.val();
+      const data = item.val();
 
       historyBox.innerHTML += `
       <div class="history-item">
-      <b>질문</b><br>
-      ${data.question}
-      <hr>
-      <b>답변</b><br>
+      <b>상품</b> : ${data.product}<br>
+      <b>고객층</b> : ${data.target}<br>
+      <b>예산</b> : ${data.budget}<br><br>
       ${data.answer}
       </div>
       `;
@@ -547,6 +532,7 @@ function loadHistory(uid){
   });
 
 }
+
 </script>
 
 </body>

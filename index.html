@@ -331,9 +331,25 @@ ttsBtn.addEventListener("click", async () => {
     if (!response.ok) throw new Error("TTS 서버 응답에 실패했습니다.");
 
     const data = await response.json();
-    if(!data.audioBase64) throw new Error("음성 데이터를 찾을 수 없습니다.");
+    
+    // [보완 1] GAS에서 에러 메시지를 보냈는지 검증
+    if (data.error) {
+      throw new Error(`GAS 서버 에러: ${data.error}`);
+    }
 
-    const binary = atob(data.audioBase64);
+    let base64String = data.audioBase64;
+    if (!base64String) {
+      throw new Error("음성 데이터(audioBase64)가 비어있습니다. GAS 로그를 확인하세요.");
+    }
+
+    // [보완 2] Base64 패딩(=) 부족으로 인한 atob 에러 방지 규칙
+    base64String = base64String.replace(/\s/g, ""); // 공백 제거
+    while (base64String.length % 4 !== 0) {
+      base64String += "=";
+    }
+
+    // 디코딩 시작
+    const binary = atob(base64String);
     const bytes = new Uint8Array(binary.length);
 
     for (let i = 0; i < binary.length; i++) {
@@ -341,8 +357,12 @@ ttsBtn.addEventListener("click", async () => {
     }
 
     const blob = new Blob([bytes], { type: "audio/mpeg" });
+    
+    // 기존 URL 해제 (메모리 관리)
+    if(audioPlayer.src) URL.revokeObjectURL(audioPlayer.src);
+    
     audioPlayer.src = URL.createObjectURL(blob);
-    audioPlayer.play().catch(e => console.log("자동 재생 방지 제어: ", e));
+    audioPlayer.play().catch(e => console.log("자동 재생 제한 제어: ", e));
 
   } catch(error) {
     alert("TTS 에러: " + error.message);
@@ -352,46 +372,3 @@ ttsBtn.addEventListener("click", async () => {
     ttsBtn.textContent = "음성 생성";
   }
 });
-
-// 기록 불러오기 함수
-function loadHistory(uid) {
-  const historyRef = ref(db, "marketing/" + uid);
-
-  onValue(historyRef, (snapshot) => {
-    historyBox.innerHTML = "";
-    
-    if(!snapshot.exists()) {
-        historyBox.innerHTML = "<p style='color:#999; text-align:center;'>저장된 마케팅 기록이 없습니다.</p>";
-        return;
-    }
-
-    // 기록 데이터를 담아 역순(최신순)으로 배치하기 위한 배열
-    const items = [];
-    snapshot.forEach((item) => {
-      items.push(item.val());
-    });
-    
-    // 최신 데이터가 위로 오도록 정렬 뒤 출력
-    items.reverse().forEach((data) => {
-      const historyItem = document.createElement("div");
-      historyItem.className = "history-item";
-      historyItem.innerHTML = `
-        <b>상품</b> : ${escapeHtml(data.product)}<br>
-        <b>고객층</b> : ${escapeHtml(data.target)}<br>
-        <b>예산</b> : ${escapeHtml(data.budget)}<br>
-        <small style="color:#aaa;">${data.date || ""}</small><br><br>
-        <div style="white-space: pre-wrap; background:#f9f9f9; padding:10px; border-radius:5px;">${escapeHtml(data.answer)}</div>
-      `;
-      historyBox.appendChild(historyItem);
-    });
-  });
-}
-
-// XSS 방지를 위한 텍스트 치환 함수
-function escapeHtml(str) {
-  if(!str) return "";
-  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-}
-</script>
-</body>
-</html>

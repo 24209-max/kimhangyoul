@@ -200,7 +200,7 @@ const voiceSelect = document.getElementById("voiceSelect");
 const audioPlayer = document.getElementById("audioPlayer");
 
 // 변수 관리
-let currentCleanAnswer = ""; // 진짜 AI 결과값만 저장해 둘 변수
+let currentCleanAnswer = ""; 
 
 // 회원가입
 signupBtn.addEventListener("click", async () => {
@@ -224,6 +224,7 @@ loginBtn.addEventListener("click", async () => {
 
   try {
     await signInWithEmailAndPassword(auth, email, password);
+    alert("로그인 성공!");
   } catch(error) {
     alert("로그인 오류: " + error.message);
   }
@@ -232,6 +233,7 @@ loginBtn.addEventListener("click", async () => {
 // 로그아웃
 logoutBtn.addEventListener("click", async () => {
   await signOut(auth);
+  alert("로그아웃 되었습니다.");
 });
 
 // 인증 상태 변화 감지
@@ -240,7 +242,7 @@ onAuthStateChanged(auth, (user) => {
     loginArea.classList.add("hidden");
     mainArea.classList.remove("hidden");
     userEmail.textContent = user.email;
-    loadHistory(user.uid);
+    loadHistory(user.uid); // 이 아래 정의된 함수를 이제 정상 작동시킵니다.
   } else {
     loginArea.classList.remove("hidden");
     mainArea.classList.add("hidden");
@@ -268,12 +270,9 @@ askBtn.addEventListener("click", async () => {
   const prompt = `상품 : ${product}\n고객층 : ${target}\n예산 : ${budget}\n\n위 정보를 분석하여\n1. 추천 홍보 채널\n2. 이벤트 아이디어\n3. 예상 효과\n4. 실행 방법\n을 자세히 설명해줘.`;
 
   try {
-    // CORS 문제를 회방하고 안정적인 통신을 위해 headers 설정 보완
     const response = await fetch(CHAT_API, {
       method: "POST",
-      headers: {
-        "Content-Type": "text/plain" // GAS 대상 fetch 시 흔히 발생하는 CORS 우회책
-      },
+      headers: { "Content-Type": "text/plain" },
       body: JSON.stringify({ question: prompt })
     });
 
@@ -283,7 +282,7 @@ askBtn.addEventListener("click", async () => {
     const answer = data.answer || "결과를 받아오지 못했습니다.";
 
     answerBox.textContent = answer;
-    currentCleanAnswer = answer; // TTS용 변수에 백업
+    currentCleanAnswer = answer; 
 
     const user = auth.currentUser;
     if (user) {
@@ -316,9 +315,7 @@ ttsBtn.addEventListener("click", async () => {
   try {
     const response = await fetch(TTS_API, {
       method: "POST",
-      headers: {
-        "Content-Type": "text/plain"
-      },
+      headers: { "Content-Type": "text/plain" },
       body: JSON.stringify({
         type: "tts",
         text: currentCleanAnswer,
@@ -331,34 +328,23 @@ ttsBtn.addEventListener("click", async () => {
     if (!response.ok) throw new Error("TTS 서버 응답에 실패했습니다.");
 
     const data = await response.json();
-    
-    // [보완 1] GAS에서 에러 메시지를 보냈는지 검증
-    if (data.error) {
-      throw new Error(`GAS 서버 에러: ${data.error}`);
-    }
+    if (data.error) throw new Error(`GAS 서버 에러: ${data.error}`);
 
     let base64String = data.audioBase64;
-    if (!base64String) {
-      throw new Error("음성 데이터(audioBase64)가 비어있습니다. GAS 로그를 확인하세요.");
-    }
+    if (!base64String) throw new Error("음성 데이터가 비어있습니다.");
 
-    // [보완 2] Base64 패딩(=) 부족으로 인한 atob 에러 방지 규칙
-    base64String = base64String.replace(/\s/g, ""); // 공백 제거
+    base64String = base64String.replace(/\s/g, ""); 
     while (base64String.length % 4 !== 0) {
       base64String += "=";
     }
 
-    // 디코딩 시작
     const binary = atob(base64String);
     const bytes = new Uint8Array(binary.length);
-
     for (let i = 0; i < binary.length; i++) {
       bytes[i] = binary.charCodeAt(i);
     }
 
     const blob = new Blob([bytes], { type: "audio/mpeg" });
-    
-    // 기존 URL 해제 (메모리 관리)
     if(audioPlayer.src) URL.revokeObjectURL(audioPlayer.src);
     
     audioPlayer.src = URL.createObjectURL(blob);
@@ -372,3 +358,38 @@ ttsBtn.addEventListener("click", async () => {
     ttsBtn.textContent = "음성 생성";
   }
 });
+
+// 💡 [복구 완료] 이전 코드에서 소실되었던 데이터 기록 로드 함수
+function loadHistory(uid) {
+  const historyRef = ref(db, "marketing/" + uid);
+  onValue(historyRef, (snapshot) => {
+    historyBox.innerHTML = "";
+    if(!snapshot.exists()) {
+        historyBox.innerHTML = "<p style='color:#999; text-align:center; padding:10px;'>저장된 마케팅 기록이 없습니다.</p>";
+        return;
+    }
+    const items = [];
+    snapshot.forEach((item) => { items.push(item.val()); });
+    
+    items.reverse().forEach((data) => {
+      const historyItem = document.createElement("div");
+      historyItem.className = "history-item";
+      historyItem.innerHTML = `
+        <b>상품</b> : ${escapeHtml(data.product)}<br>
+        <b>고객층</b> : ${escapeHtml(data.target)}<br>
+        <b>예산</b> : ${escapeHtml(data.budget)}<br>
+        <small style="color:#aaa;">${data.date || ""}</small><br><br>
+        <div style="white-space: pre-wrap; background:#f9f9f9; padding:10px; border-radius:5px;">${escapeHtml(data.answer)}</div>
+      `;
+      historyBox.appendChild(historyItem);
+    });
+  });
+}
+
+function escapeHtml(str) {
+  if(!str) return "";
+  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+</script>
+</body>
+</html>

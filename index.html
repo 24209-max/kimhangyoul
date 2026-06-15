@@ -3,263 +3,167 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>AI 마케팅 컨설턴트</title>
-
 <style>
-
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial,sans-serif;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
 }
-
-body{
-background:linear-gradient(135deg,#e3f2fd,#fce4ec);
-min-height:100vh;
-padding:30px;
+body {
+    background: linear-gradient(135deg, #e3f2fd, #fce4ec);
+    min-height: 100vh;
+    padding: 30px;
 }
-
-.container{
-max-width:1000px;
-margin:auto;
-background:white;
-padding:25px;
-border-radius:20px;
-box-shadow:0 10px 30px rgba(0,0,0,0.15);
+.container {
+    max-width: 1000px;
+    margin: auto;
+    background: white;
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
 }
-
-h1{
-text-align:center;
-margin-bottom:10px;
+h1 {
+    text-align: center;
+    margin-bottom: 10px;
 }
-
-.subtitle{
-text-align:center;
-color:#666;
-margin-bottom:20px;
+.subtitle {
+    text-align: center;
+    color: #666;
+    margin-bottom: 20px;
 }
-
-.card{
-background:#f8f9fa;
-padding:15px;
-border-radius:15px;
-margin-bottom:15px;
+.card {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 15px;
+    margin-bottom: 15px;
 }
-
-input,textarea,select{
-width:100%;
-padding:12px;
-border:1px solid #ddd;
-border-radius:10px;
-margin-top:8px;
+input, textarea, select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    margin-top: 8px;
 }
-
-button{
-border:none;
-padding:12px 20px;
-border-radius:10px;
-cursor:pointer;
-font-weight:bold;
-margin-top:10px;
+button {
+    border: none;
+    padding: 12px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 10px;
 }
-
-.primary{
-background:#42a5f5;
-color:white;
+.primary {
+    background: #42a5f5;
+    color: white;
 }
-
-.success{
-background:#4caf50;
-color:white;
+.success {
+    background: #4caf50;
+    color: white;
 }
-
-.danger{
-background:#ef5350;
-color:white;
+.danger {
+    background: #ef5350;
+    color: white;
 }
-
-.answer{
-background:#f1f8ff;
-padding:15px;
-border-radius:12px;
-min-height:150px;
-white-space:pre-wrap;
+.answer {
+    background: #f1f8ff;
+    padding: 15px;
+    border-radius: 12px;
+    min-height: 150px;
+    white-space: pre-wrap;
 }
-
-.hidden{
-display:none;
+.hidden {
+    display: none;
 }
-
-audio{
-width:100%;
-margin-top:10px;
+audio {
+    width: 100%;
+    margin-top: 10px;
 }
-
-.history-item{
-padding:10px;
-margin-top:10px;
-background:white;
-border-radius:10px;
-border-left:4px solid #42a5f5;
+.history-item {
+    padding: 10px;
+    margin-top: 10px;
+    background: white;
+    border-radius: 10px;
+    border-left: 4px solid #42a5f5;
 }
-
-.user-info{
-display:flex;
-justify-content:space-between;
-align-items:center;
-margin-bottom:20px;
+.user-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
 }
-
 </style>
 </head>
 <body>
 
 <div class="container">
+    <h1>AI 마케팅 컨설턴트</h1>
+    <div class="subtitle">
+        상품 · 고객층 · 예산을 입력하면 AI가 마케팅 전략을 추천합니다.
+    </div>
 
-<h1>AI 마케팅 컨설턴트</h1>
+    <div id="loginArea">
+        <div class="card">
+            <h3>회원가입</h3>
+            <input type="email" id="signupEmail" placeholder="이메일">
+            <input type="password" id="signupPassword" placeholder="비밀번호">
+            <button class="success" id="signupBtn">회원가입</button>
+        </div>
+        <div class="card">
+            <h3>로그인</h3>
+            <input type="email" id="loginEmail" placeholder="이메일">
+            <input type="password" id="loginPassword" placeholder="비밀번호">
+            <button class="primary" id="loginBtn">로그인</button>
+        </div>
+    </div>
 
-<div class="subtitle">
-상품 · 고객층 · 예산을 입력하면 AI가 마케팅 전략을 추천합니다.
-</div>
+    <div id="mainArea" class="hidden">
+        <div class="user-info">
+            <div>로그인 : <span id="userEmail"></span></div>
+            <button id="logoutBtn" class="danger">로그아웃</button>
+        </div>
 
-<div id="loginArea">
+        <div class="card">
+            <h3>마케팅 정보 입력</h3>
+            <input id="productInput" placeholder="판매 상품">
+            <input id="targetInput" placeholder="고객층">
+            <input id="budgetInput" placeholder="예산">
+            <button id="askBtn" class="primary">전략 생성</button>
+        </div>
 
-<div class="card">
+        <div class="card">
+            <h3>AI 추천 결과</h3>
+            <div id="answerBox" class="answer">아직 결과 없음</div>
+        </div>
 
-<h3>회원가입</h3>
+        <div class="card">
+            <h3>TTS 음성 듣기</h3>
+            <select id="voiceSelect">
+                <option value="alloy">alloy</option>
+                <option value="echo">echo</option>
+                <option value="fable">fable</option>
+                <option value="nova">nova</option>
+                <option value="onyx">onyx</option>
+                <option value="shimmer">shimmer</option>
+            </select>
+            <button id="ttsBtn" class="success">음성 생성</button>
+            <audio id="audioPlayer" controls></audio>
+        </div>
 
-<input type="email" id="signupEmail" placeholder="이메일">
-
-<input type="password" id="signupPassword" placeholder="비밀번호">
-
-<button class="success" id="signupBtn">
-회원가입
-</button>
-
-</div>
-
-<div class="card">
-
-<h3>로그인</h3>
-
-<input type="email" id="loginEmail" placeholder="이메일">
-
-<input type="password" id="loginPassword" placeholder="비밀번호">
-
-<button class="primary" id="loginBtn">
-로그인
-</button>
-
-</div>
-
-</div>
-
-<div id="mainArea" class="hidden">
-
-<div class="user-info">
-
-<div>
-로그인 :
-<span id="userEmail"></span>
-</div>
-
-<button id="logoutBtn" class="danger">
-로그아웃
-</button>
-
-</div>
-
-<div class="card">
-
-<h3>마케팅 정보 입력</h3>
-
-<input
-id="productInput"
-placeholder="판매 상품">
-
-<input
-id="targetInput"
-placeholder="고객층">
-
-<input
-id="budgetInput"
-placeholder="예산">
-
-<button id="askBtn" class="primary">
-전략 생성
-</button>
-
-</div>
-
-<div class="card">
-
-<h3>AI 추천 결과</h3>
-
-<div id="answerBox" class="answer">
-아직 결과 없음
-</div>
-
-</div>
-
-<div class="card">
-
-<h3>TTS 음성 듣기</h3>
-
-<select id="voiceSelect">
-
-<option value="alloy">alloy</option>
-<option value="echo">echo</option>
-<option value="fable">fable</option>
-<option value="nova">nova</option>
-<option value="onyx">onyx</option>
-<option value="shimmer">shimmer</option>
-
-</select>
-
-<button id="ttsBtn" class="success">
-음성 생성
-</button>
-
-<audio id="audioPlayer" controls></audio>
-
-</div>
-
-<div class="card">
-
-<h3>전략 기록</h3>
-
-<div id="historyBox"></div>
-
-</div>
-
-</div>
-
+        <div class="card">
+            <h3>전략 기록</h3>
+            <div id="historyBox"></div>
+        </div>
+    </div>
 </div>
 
 <script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-import { initializeApp }
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-
-import {
-getAuth,
-createUserWithEmailAndPassword,
-signInWithEmailAndPassword,
-signOut,
-onAuthStateChanged
-}
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-import {
-getDatabase,
-ref,
-push,
-onValue
-}
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
+// Firebase 설정
 const firebaseConfig = {
   apiKey: "AIzaSyB4OeJNLOSIM_XZzUn4ortKM8eAYErh-Yc",
   authDomain: "ghddbtjdrowlsek.firebaseapp.com",
@@ -274,266 +178,220 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getDatabase(app);
 
-const CHAT_API =
-"https://script.google.com/macros/s/AKfycbwQK8Dxfv_hsphNAA7ytpnsFjGYmgXW8iUgi5gpCDCYhI3kNWZcz9TMLQ65iX7WO5R4/exec";
+// GAS 웹 앱 API 주소
+const CHAT_API = "https://script.google.com/macros/s/AKfycbwQK8Dxfv_hsphNAA7ytpnsFjGYmgXW8iUgi5gpCDCYhI3kNWZcz9TMLQ65iX7WO5R4/exec";
+const TTS_API = "https://script.google.com/macros/s/AKfycbxDNMIktE288seW2Mr5YgksYFeAP3SNl8YyQZFa1DuvD0N_8pjRLDmxkZBYyQ4WGPmt/exec";
 
-const TTS_API =
-"https://script.google.com/macros/s/AKfycbxDNMIktE288seW2Mr5YgksYFeAP3SNl8YyQZFa1DuvD0N_8pjRLDmxkZBYyQ4WGPmt/exec";
-
+// DOM 요소 매핑
 const signupBtn = document.getElementById("signupBtn");
 const loginBtn = document.getElementById("loginBtn");
 const logoutBtn = document.getElementById("logoutBtn");
-
 const loginArea = document.getElementById("loginArea");
 const mainArea = document.getElementById("mainArea");
 const userEmail = document.getElementById("userEmail");
-
 const askBtn = document.getElementById("askBtn");
 const answerBox = document.getElementById("answerBox");
+const productInput = document.getElementById("productInput");
+const targetInput = document.getElementById("targetInput");
+const budgetInput = document.getElementById("budgetInput");
+const historyBox = document.getElementById("historyBox");
+const ttsBtn = document.getElementById("ttsBtn");
+const voiceSelect = document.getElementById("voiceSelect");
+const audioPlayer = document.getElementById("audioPlayer");
 
-const productInput =
-document.getElementById("productInput");
+// 변수 관리
+let currentCleanAnswer = ""; // 진짜 AI 결과값만 저장해 둘 변수
 
-const targetInput =
-document.getElementById("targetInput");
-
-const budgetInput =
-document.getElementById("budgetInput");
-
-const historyBox =
-document.getElementById("historyBox");
-
-const ttsBtn =
-document.getElementById("ttsBtn");
-
-const voiceSelect =
-document.getElementById("voiceSelect");
-
-const audioPlayer =
-document.getElementById("audioPlayer");
-
+// 회원가입
 signupBtn.addEventListener("click", async () => {
-
+  const email = document.getElementById("signupEmail").value.trim();
+  const password = document.getElementById("signupPassword").value;
+  if(!email || !password) return alert("이메일과 비밀번호를 입력하세요.");
+  
   try {
-
-    await createUserWithEmailAndPassword(
-      auth,
-      document.getElementById("signupEmail").value,
-      document.getElementById("signupPassword").value
-    );
-
+    await createUserWithEmailAndPassword(auth, email, password);
     alert("회원가입 완료");
-
   } catch(error) {
-
-    alert(error.message);
-
+    alert("회원가입 오류: " + error.message);
   }
-
 });
 
+// 로그인
 loginBtn.addEventListener("click", async () => {
+  const email = document.getElementById("loginEmail").value.trim();
+  const password = document.getElementById("loginPassword").value;
+  if(!email || !password) return alert("이메일과 비밀번호를 입력하세요.");
 
   try {
-
-    await signInWithEmailAndPassword(
-      auth,
-      document.getElementById("loginEmail").value,
-      document.getElementById("loginPassword").value
-    );
-
+    await signInWithEmailAndPassword(auth, email, password);
   } catch(error) {
-
-    alert(error.message);
-
+    alert("로그인 오류: " + error.message);
   }
-
 });
 
+// 로그아웃
 logoutBtn.addEventListener("click", async () => {
-
   await signOut(auth);
-
 });
 
-onAuthStateChanged(auth,(user)=>{
-
-  if(user){
-
+// 인증 상태 변화 감지
+onAuthStateChanged(auth, (user) => {
+  if (user) {
     loginArea.classList.add("hidden");
     mainArea.classList.remove("hidden");
-
     userEmail.textContent = user.email;
-
     loadHistory(user.uid);
-
-  }else{
-
+  } else {
     loginArea.classList.remove("hidden");
     mainArea.classList.add("hidden");
-
+    userEmail.textContent = "";
+    historyBox.innerHTML = "";
+    answerBox.textContent = "아직 결과 없음";
+    currentCleanAnswer = "";
   }
-
 });
 
-askBtn.addEventListener("click", async ()=>{
+// AI 전략 생성 버튼 이벤트
+askBtn.addEventListener("click", async () => {
+  const product = productInput.value.trim();
+  const target = targetInput.value.trim();
+  const budget = budgetInput.value.trim();
 
-  const product = productInput.value;
-  const target = targetInput.value;
-  const budget = budgetInput.value;
-
-  if(!product || !target || !budget){
-
-    alert("모든 항목 입력");
-
+  if(!product || !target || !budget) {
+    alert("모든 항목을 입력해주세요.");
     return;
-
   }
 
-  answerBox.textContent =
-  "AI 전략 생성 중...";
+  askBtn.disabled = true;
+  answerBox.textContent = "AI 전략 생성 중입니다... 잠시만 기다려주세요.";
 
-  const prompt = `
-상품 : ${product}
+  const prompt = `상품 : ${product}\n고객층 : ${target}\n예산 : ${budget}\n\n위 정보를 분석하여\n1. 추천 홍보 채널\n2. 이벤트 아이디어\n3. 예상 효과\n4. 실행 방법\n을 자세히 설명해줘.`;
 
-고객층 : ${target}
+  try {
+    // CORS 문제를 회방하고 안정적인 통신을 위해 headers 설정 보완
+    const response = await fetch(CHAT_API, {
+      method: "POST",
+      headers: {
+        "Content-Type": "text/plain" // GAS 대상 fetch 시 흔히 발생하는 CORS 우회책
+      },
+      body: JSON.stringify({ question: prompt })
+    });
 
-예산 : ${budget}
+    if (!response.ok) throw new Error("서버 응답 오류가 발생했습니다.");
 
-위 정보를 분석하여
+    const data = await response.json();
+    const answer = data.answer || "결과를 받아오지 못했습니다.";
 
-1. 추천 홍보 채널
-2. 이벤트 아이디어
-3. 예상 효과
-4. 실행 방법
+    answerBox.textContent = answer;
+    currentCleanAnswer = answer; // TTS용 변수에 백업
 
-을 자세히 설명해줘.
-`;
-
-  try{
-
-    const response = await fetch(
-      CHAT_API,
-      {
-        method:"POST",
-        body:JSON.stringify({
-          question:prompt
-        })
-      }
-    );
-
-    const data =
-    await response.json();
-
-    const answer =
-    data.answer || "결과 없음";
-
-    answerBox.textContent =
-    answer;
-
-    const user =
-    auth.currentUser;
-
-    await push(
-      ref(db,"marketing/"+user.uid),
-      {
+    const user = auth.currentUser;
+    if (user) {
+      await push(ref(db, "marketing/" + user.uid), {
         product,
         target,
         budget,
         answer,
-        date:new Date().toLocaleString()
-      }
-    );
-
-  }catch(error){
-
-    answerBox.textContent =
-    error.message;
-
-  }
-
-});
-
-ttsBtn.addEventListener("click", async ()=>{
-
-  try{
-
-    const response = await fetch(
-      TTS_API,
-      {
-        method:"POST",
-        body:JSON.stringify({
-          type:"tts",
-          text:answerBox.textContent,
-          model:"tts-1",
-          voice:voiceSelect.value,
-          speed:1
-        })
-      }
-    );
-
-    const data =
-    await response.json();
-
-    const binary =
-    atob(data.audioBase64);
-
-    const bytes =
-    new Uint8Array(binary.length);
-
-    for(let i=0;i<binary.length;i++){
-
-      bytes[i] =
-      binary.charCodeAt(i);
-
+        date: new Date().toLocaleString()
+      });
     }
-
-    const blob =
-    new Blob(
-      [bytes],
-      {type:"audio/mpeg"}
-    );
-
-    audioPlayer.src =
-    URL.createObjectURL(blob);
-
-  }catch(error){
-
-    alert(error.message);
-
+  } catch(error) {
+    answerBox.textContent = "오류 발생: " + error.message;
+    console.error(error);
+  } finally {
+    askBtn.disabled = false;
   }
-
 });
 
-function loadHistory(uid){
+// TTS 음성 변환 생성 이벤트
+ttsBtn.addEventListener("click", async () => {
+  if (!currentCleanAnswer || currentCleanAnswer === "결과를 받아오지 못했습니다.") {
+    alert("먼저 AI 전략 생성을 완료해 주세요.");
+    return;
+  }
 
-  const historyRef =
-  ref(db,"marketing/"+uid);
+  ttsBtn.disabled = true;
+  ttsBtn.textContent = "음성 파일 생성 중...";
 
-  onValue(historyRef,(snapshot)=>{
-
-    historyBox.innerHTML = "";
-
-    snapshot.forEach((item)=>{
-
-      const data = item.val();
-
-      historyBox.innerHTML += `
-      <div class="history-item">
-      <b>상품</b> : ${data.product}<br>
-      <b>고객층</b> : ${data.target}<br>
-      <b>예산</b> : ${data.budget}<br><br>
-      ${data.answer}
-      </div>
-      `;
-
+  try {
+    const response = await fetch(TTS_API, {
+      method: "POST",
+      headers: {
+        "Content-Type": "text/plain"
+      },
+      body: JSON.stringify({
+        type: "tts",
+        text: currentCleanAnswer,
+        model: "tts-1",
+        voice: voiceSelect.value,
+        speed: 1
+      })
     });
 
-  });
+    if (!response.ok) throw new Error("TTS 서버 응답에 실패했습니다.");
 
+    const data = await response.json();
+    if(!data.audioBase64) throw new Error("음성 데이터를 찾을 수 없습니다.");
+
+    const binary = atob(data.audioBase64);
+    const bytes = new Uint8Array(binary.length);
+
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+
+    const blob = new Blob([bytes], { type: "audio/mpeg" });
+    audioPlayer.src = URL.createObjectURL(blob);
+    audioPlayer.play().catch(e => console.log("자동 재생 방지 제어: ", e));
+
+  } catch(error) {
+    alert("TTS 에러: " + error.message);
+    console.error(error);
+  } finally {
+    ttsBtn.disabled = false;
+    ttsBtn.textContent = "음성 생성";
+  }
+});
+
+// 기록 불러오기 함수
+function loadHistory(uid) {
+  const historyRef = ref(db, "marketing/" + uid);
+
+  onValue(historyRef, (snapshot) => {
+    historyBox.innerHTML = "";
+    
+    if(!snapshot.exists()) {
+        historyBox.innerHTML = "<p style='color:#999; text-align:center;'>저장된 마케팅 기록이 없습니다.</p>";
+        return;
+    }
+
+    // 기록 데이터를 담아 역순(최신순)으로 배치하기 위한 배열
+    const items = [];
+    snapshot.forEach((item) => {
+      items.push(item.val());
+    });
+    
+    // 최신 데이터가 위로 오도록 정렬 뒤 출력
+    items.reverse().forEach((data) => {
+      const historyItem = document.createElement("div");
+      historyItem.className = "history-item";
+      historyItem.innerHTML = `
+        <b>상품</b> : ${escapeHtml(data.product)}<br>
+        <b>고객층</b> : ${escapeHtml(data.target)}<br>
+        <b>예산</b> : ${escapeHtml(data.budget)}<br>
+        <small style="color:#aaa;">${data.date || ""}</small><br><br>
+        <div style="white-space: pre-wrap; background:#f9f9f9; padding:10px; border-radius:5px;">${escapeHtml(data.answer)}</div>
+      `;
+      historyBox.appendChild(historyItem);
+    });
+  });
 }
 
+// XSS 방지를 위한 텍스트 치환 함수
+function escapeHtml(str) {
+  if(!str) return "";
+  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
 </script>
-
 </body>
 </html>

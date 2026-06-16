@@ -202,16 +202,47 @@ const audioPlayer = document.getElementById("audioPlayer");
 // 변수 관리
 let currentCleanAnswer = ""; 
 
+// 💡 안전을 위해 도우미 함수들을 위쪽으로 먼저 선언합니다.
+const escapeHtml = (str) => {
+  if(!str) return "";
+  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+};
+
+const loadHistory = (uid) => {
+  const historyRef = ref(db, "marketing/" + uid);
+  onValue(historyRef, (snapshot) => {
+    historyBox.innerHTML = "";
+    if(!snapshot.exists()) {
+        historyBox.innerHTML = "<p style='color:#999; text-align:center; padding:10px;'>저장된 마케팅 기록이 없습니다.</p>";
+        return;
+    }
+    const items = [];
+    snapshot.forEach((item) => { items.push(item.val()); });
+    
+    items.reverse().forEach((data) => {
+      const historyItem = document.createElement("div");
+      historyItem.className = "history-item";
+      historyItem.innerHTML = `
+        <b>상품</b> : ${escapeHtml(data.product)}<br>
+        <b>고객층</b> : ${escapeHtml(data.target)}<br>
+        <b>예산</b> : ${escapeHtml(data.budget)}<br>
+        <small style="color:#aaa;">${data.date || ""}</small><br><br>
+        <div style="white-space: pre-wrap; background:#f9f9f9; padding:10px; border-radius:5px;">${escapeHtml(data.answer)}</div>
+      `;
+      historyBox.appendChild(historyItem);
+    });
+  });
+};
+
 // 회원가입
 signupBtn.addEventListener("click", async () => {
-alert("회원가입 버튼이 정상적으로 눌렸습니다!");
   const email = document.getElementById("signupEmail").value.trim();
   const password = document.getElementById("signupPassword").value;
   if(!email || !password) return alert("이메일과 비밀번호를 입력하세요.");
   
   try {
     await createUserWithEmailAndPassword(auth, email, password);
-    alert("회원가입 완료");
+    alert("회원가입 성공 및 자동 로그인 완료!");
   } catch(error) {
     alert("회원가입 오류: " + error.message);
   }
@@ -243,7 +274,7 @@ onAuthStateChanged(auth, (user) => {
     loginArea.classList.add("hidden");
     mainArea.classList.remove("hidden");
     userEmail.textContent = user.email;
-    loadHistory(user.uid); // 이 아래 정의된 함수를 이제 정상 작동시킵니다.
+    loadHistory(user.uid); 
   } else {
     loginArea.classList.remove("hidden");
     mainArea.classList.add("hidden");
@@ -280,6 +311,8 @@ askBtn.addEventListener("click", async () => {
     if (!response.ok) throw new Error("서버 응답 오류가 발생했습니다.");
 
     const data = await response.json();
+    if (data.error) throw new Error(data.error);
+
     const answer = data.answer || "결과를 받아오지 못했습니다.";
 
     answerBox.textContent = answer;
@@ -359,38 +392,6 @@ ttsBtn.addEventListener("click", async () => {
     ttsBtn.textContent = "음성 생성";
   }
 });
-
-// 💡 [복구 완료] 이전 코드에서 소실되었던 데이터 기록 로드 함수
-function loadHistory(uid) {
-  const historyRef = ref(db, "marketing/" + uid);
-  onValue(historyRef, (snapshot) => {
-    historyBox.innerHTML = "";
-    if(!snapshot.exists()) {
-        historyBox.innerHTML = "<p style='color:#999; text-align:center; padding:10px;'>저장된 마케팅 기록이 없습니다.</p>";
-        return;
-    }
-    const items = [];
-    snapshot.forEach((item) => { items.push(item.val()); });
-    
-    items.reverse().forEach((data) => {
-      const historyItem = document.createElement("div");
-      historyItem.className = "history-item";
-      historyItem.innerHTML = `
-        <b>상품</b> : ${escapeHtml(data.product)}<br>
-        <b>고객층</b> : ${escapeHtml(data.target)}<br>
-        <b>예산</b> : ${escapeHtml(data.budget)}<br>
-        <small style="color:#aaa;">${data.date || ""}</small><br><br>
-        <div style="white-space: pre-wrap; background:#f9f9f9; padding:10px; border-radius:5px;">${escapeHtml(data.answer)}</div>
-      `;
-      historyBox.appendChild(historyItem);
-    });
-  });
-}
-
-function escapeHtml(str) {
-  if(!str) return "";
-  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-}
 </script>
 </body>
 </html>
